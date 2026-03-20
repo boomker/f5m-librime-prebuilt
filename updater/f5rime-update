@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # 出错立即退出
 # 仓库 API URL
-API_URL="https://api.github.com/repos/MokOopsing/f5m-rime-arm64-extra/releases/latest"
+API_URL="https://api.github.com/repos/boomker/f5m-rime-arm64-extra/releases/latest"
 #export https_proxy="http://10.42.0.1:7890"
 #export http_proxy="http://10.42.0.1:7890"
 #export all_proxy="socks5://10.42.0.1:7890"
