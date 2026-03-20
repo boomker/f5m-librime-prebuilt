@@ -5,7 +5,6 @@ on:
   push:
     branches: [ "*" ]
   schedule:
-    - cron: '0 23 * * *'
     - cron: '0 4 * * *'
 
 jobs:
@@ -181,20 +180,6 @@ jobs:
           cat CMakePresets.json
 
 
-      # 6️⃣ 修改 rimestate.cpp
-      - name: Patch rimestate.cpp（https://github.com/fcitx/fcitx5-rime/pull/113）
-        working-directory: fcitx5-plugins
-        if: false
-        run: |
-          sed -i '' '/if (context.menu.num_candidates) {/c\
-          \ \ \ \ \ \ \ \ if (!api->get_option(session, "_hide_candidate") && context.menu.num_candidates) {\
-          ' fcitx5-rime/src/rimestate.cpp
-          echo "cat fcitx5-rime/src/rimestate.cpp start"
-          echo ""
-          cat fcitx5-rime/src/rimestate.cpp
-          echo ""
-          echo "cat fcitx5-rime/src/rimestate.cpp end"
-
       # 7️⃣ 编译
       - name: Configure & Build
         working-directory: fcitx5-plugins
@@ -205,22 +190,12 @@ jobs:
           GOARCH: arm64
         run: |
           ls -l patches
-          #git apply --directory=libime patches/libime.patch
-          #git apply --directory=fcitx5-jyutping patches/jyutping.patch
           git apply --directory=fcitx5-rime patches/rime.log.patch
-          #git apply --directory=fcitx5-table-other patches/table-other.patch
-          #git apply --directory=fcitx5-zhuyin patches/zhuyin.patch
-          #cmake -B build/macos-arm64 -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64
           cmake --preset ci-rime-only \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_OSX_ARCHITECTURES=arm64
 
           cmake --build build/macos-arm64
-          #./scripts/install.sh macos arm64
-          ls -l ./
-          ls -l ./build/
-          ls -l ./build/macos-arm64/
-          find . -name "librime.so" | xargs ls -l
           find . -name 'librime.so' -exec strip -x {} \;
 
       # 8️⃣ 上传 artifact
