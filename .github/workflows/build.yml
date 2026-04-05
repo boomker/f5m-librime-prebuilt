@@ -117,6 +117,11 @@ jobs:
           wget -P cache/macos https://github.com/boomker/f5m-librime-prebuilder/releases/download/latest/lua-arm64.tar.bz2
           tar xf cache/macos/librime-arm64.tar.bz2 -C build/macos-arm64/usr
           tar xf cache/macos/lua-arm64.tar.bz2 -C build/macos-arm64/usr
+          # Workaround: prebuilt librime exports sqlite symbols but may not export
+          # sqlite link flag to downstream build metadata.
+          if ! grep -q -- '-lsqlite3' build/macos-arm64/usr/lib/pkgconfig/rime.pc; then
+            sed -i.bak 's|^Libs:.*$|& -lsqlite3|' build/macos-arm64/usr/lib/pkgconfig/rime.pc
+          fi
           sudo tar xf cache/macos/marisa-arm64.tar.bz2 -C /usr/local bin/marisa-build # Make use of Rosetta
           pip install dirhash
 
@@ -192,6 +197,7 @@ jobs:
           CGO_CFLAGS: -mmacosx-version-min=13.3
           GOFLAGS: -ldflags=-buildid=
           GOARCH: arm64
+          LDFLAGS: -lsqlite3
         run: |
           ls -l patches
           git apply --directory=fcitx5-rime patches/rime.log.patch
